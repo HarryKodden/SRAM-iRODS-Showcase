@@ -1,0 +1,36 @@
+FROM irods-runner-ubuntu20
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TERM xterm-256color
+
+RUN apt-get update
+RUN apt-get install -y libfuse2
+RUN apt-get install -y build-essential make ca-certificates git sudo
+RUN apt-get install -y autoconf libpam-dev libcurl4-gnutls-dev libhiredis-dev libssl-dev
+RUN apt-get install -y rsyslog locales
+
+RUN locale-gen en_US.UTF-8
+RUN update-locale
+
+# PREPARE SRAM-TOKEN-SERVICE
+WORKDIR /opt
+RUN git clone https://github.com/HarryKodden/SRAM-Token-Service.git
+RUN cd SRAM-Token-Service && make && make install
+
+# PREPARE IRODS SERVER
+ADD packages /packages
+
+RUN dpkg -i /packages/irods-runtime_4.3.0-1~focal_amd64.deb
+RUN dpkg -i /packages/irods-server_4.3.0-1~focal_amd64.deb
+RUN dpkg -i /packages/irods-database-plugin-postgres_4.3.0-1~focal_amd64.deb
+RUN dpkg -i /packages/irods-icommands_4.3.0-1~focal_amd64.deb
+
+VOLUME /var/lib/irods
+VOLUME /var/lib/ssl
+
+ADD genresp.sh /usr/local/bin/genresp.sh
+ADD icat.sh /usr/local/bin/icat.sh
+
+RUN chmod a+x /usr/local/bin/*.sh
+
+ENTRYPOINT ["/usr/local/bin/icat.sh", "/keep_alive.sh" ]

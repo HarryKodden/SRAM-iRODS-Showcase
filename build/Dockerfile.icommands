@@ -1,0 +1,32 @@
+FROM irods-runner-ubuntu20
+
+ENV TERM xterm-256color
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install -y libfuse2
+RUN apt-get install -y git libsasl2-dev libldap2-dev ldap-utils vim python3 python3-pip
+RUN apt-get install -y apt-transport-https locales openssh-server cron
+
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
+
+# PREPARE IRODS-LDAP-SYNC
+WORKDIR /opt
+RUN git clone https://github.com/HarryKodden/irods-ldap-sync.git
+RUN cd irods-ldap-sync && pip install -r requirements.txt && ln -s ${PWD}/src/sync.py /usr/local/bin/
+
+# PREPARE IRODS CLIENT
+ADD packages /packages
+
+RUN dpkg -i /packages/irods-runtime_4.3.0-1~focal_amd64.deb
+RUN dpkg -i /packages/irods-icommands_4.3.0-1~focal_amd64.deb
+
+ADD icommands.sh /usr/local/bin/icommands.sh
+
+RUN chmod a+x /usr/local/bin/*.sh
+
+ENTRYPOINT []
+
+EXPOSE 22
+
+ENTRYPOINT ["/usr/local/bin/icommands.sh", "/keep_alive.sh" ]

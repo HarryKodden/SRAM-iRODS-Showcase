@@ -53,7 +53,7 @@ services:
     build:
       context: build
       dockerfile: Dockerfile.icommands
-    hostname: terminal
+    hostname: irods-demo
     container_name: icommands
     volumes:
       - irods_ssl:/var/lib/ssl
@@ -62,8 +62,8 @@ services:
     env_file:
       - ./env/irods.env
       - ./env/ldap.env
-#   ports:
-#     - "2222:22"
+    ports:
+      - "2222:22"
     environment:
       LOG_LEVEL: INFO
       IRODS_JSON: /etc/default/default_irods_environment.json

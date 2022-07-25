@@ -29,11 +29,31 @@ mkdir -p /var/run/sshd \
     && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 # Prepare CRON...
-crontab -l | { cat; echo "*/5 * * * * python3 /usr/local/bin/sync.py"; } | crontab -
+read -r -d '' CRONJOB <<- EOM
+    IRODS_AUTH=${IRODS_AUTH}
+    IRODS_CERT=${IRODS_CERT}
+    IRODS_HOST=${IRODS_HOST}
+    IRODS_JSON=${IRODS_JSON}
+    IRODS_PASS=${IRODS_PASS}
+    IRODS_PORT=${IRODS_PORT}
+    IRODS_USER=${IRODS_USER}
+    IRODS_ZONE=${IRODS_ZONE}
+    LDAP_ADMIN_PASSWORD=${LDAP_ADMIN_PASSWORD}
+    LDAP_BASE_DN=${LDAP_BASE_DN}
+    LDAP_BIND_DN=${LDAP_BIND_DN}
+    LDAP_HOST=${LDAP_HOST}
+    LDAP_MODE=${LDAP_MODE}
+    LOG_LEVEL=${LOG_LEVEL}
+    SSH_HOST=${SSH_HOST}
+    SSH_PORT=${SSH_PORT}
+    python3 /usr/local/bin/sync.py >> /tmp/sync.log 2>&1
+EOM
+crontab -l | { cat; echo "* * * * * "$CRONJOB; } | crontab -
 
 # Start services...
 service cron start
 service ssh start
+service rsyslog start
 
 echo "iCommands is ready"
 

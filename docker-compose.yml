@@ -1,7 +1,6 @@
-version: '3'
+version: "3"
 
 volumes:
-
   irods_database:
     driver: local
   irods_config:
@@ -10,7 +9,6 @@ volumes:
     driver: local
 
 services:
-
   database:
     image: postgres:9.1
     container_name: database
@@ -62,8 +60,8 @@ services:
     env_file:
       - ./env/irods.env
       - ./env/ldap.env
-#   ports:
-#     - "2222:22"
+    #   ports:
+    #     - "2222:22"
     environment:
       LOG_LEVEL: INFO
       IRODS_JSON: /etc/default/default_irods_environment.json

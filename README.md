@@ -31,8 +31,9 @@ When these components are installed and verified to function, we can continue bu
 We need to have the iRODS software, in this showcase the latest code is taken from the iRODS development repository https://github.com/irods/irods_development_environment
 
 We need to have:
-a) iRODS 'runner' docker images.
-b) iRODS software packages.
+
+- iRODS 'runner' docker images.
+- iRODS software packages.
 
 To facilitate these steps, a separate repository is available: https://github.com/HarryKodden/iRODS-Development-Bootstrapper.git
 
@@ -46,20 +47,20 @@ These steps will take an awfull amount of time, best to start them off, see that
 
 Once the build process has completed the following will be created:
 
-- a docker image called "**irods-runner-ubuntu20**"
-- a directory called "**~/builds/ubuntu20/**" with 3 subdirectories:
+- docker image called "**irods-runner-ubuntu20**"
+- directory called "**~/builds/ubuntu20/**" with 3 subdirectories:
 
   - client
   - server
   - packages
 
-  For this demonstration we only need the 'packages' contents.
+For this demonstration we only need the 'packages' contents.
 
-  **Note:** The builded packages for **ubuntu20** are included in this repository as well, they are added in **/build/packages**
+**Note:** The builded packages for **ubuntu20** are included in this repository as well, they are added in **/build/packages**
 
-  If you have build the packages yourself, replace the packages in the ~/build/packages with your builded packages
+If you have build the packages yourself, replace the packages in the ~/build/packages with your builded packages
 
-  This step is now complete !
+This step is now complete !
 
 ### Step 2. Create your environment
 
@@ -71,7 +72,7 @@ You will need to configure your environment variables. In particular we need con
 - **irods.env**: iRODS configuration
 
 Samples for these configuration components are provided in the **env** folder.
-Just copy each sample file to a file without the **.sample** suffix. The adjust the copied file to satisy your needs.
+Just copy each sample file to a file without the **.sample** suffix. Adjust the copied file to satisy your needs.
 
 ```bash
 for i in db irods ldap sram
@@ -136,6 +137,8 @@ The remaining values are fairly standard, but you can deviate from these if you 
 
 ### Step 3. Deploy software stack
 
+This step is pretty simple. Off course much can go wrong so please look carefull to the output during deployment to see that everything looks good.
+
 ```bash
 docker-compose build
 docker-compose up -d
@@ -146,11 +149,48 @@ docker-compose up -d
 When all is configured properly, you should now be able to start a session in the **icommands** container. You can do that via 2 possible methods:
 
 1. **docker exec -ti icommands bash**
+   This is just stepping into the running container, you will have **root** privileges via this method, you can now 'become' any other user, for example: **su - \<SRAM Userid\>**
+
 2. **ssh -P 2222 \<SRAM Userid\>@localhost** or
    **ssh -P 2222 \<SRAM Userid\>@\<FQDN or IP Address\>**
-
-1] This is just stepping into the running container, you will have **root** privileges via this method, you can now 'become' any other user, for example: **su - \<SRAM Userid\>**
-2] This is the preferred method.
+   This is the preferred method.
 
 You may ask yourself: "<i>How is your SRAM User provisioned in this container ?</i>"
+
 The answer is: every minute a cronjob is contacting the SRAM LDAP and mirrors each SRAM collaboration member as a valid user in this container as well as a valid iRODS user in the iRODS Catalogue.
+
+Next, try out your first **irods** command, for example:
+
+```bash
+$ ils<enter>
+```
+
+When everythig is setup properly the system sould respond with:
+
+```bash
+$ ils
+Enter your current PAM password:
+```
+
+Now copy/paste the SRAM token that you have registered as your Service Token in SRAM. If you have pasted an incorrect token, the system will respond:
+
+```bash
+$ ils
+Enter your current PAM password:
+Error occurred while authenticating user [testuser] [PAM_AUTH_PASSWORD_FAILED: failed to perform request
+
+] [ec=-993000] failed with error -993000 PAM_AUTH_PASSWORD_FAILED
+```
+
+Enter a valid token will result in:
+
+```bash
+$ ils
+/tempZone/home/testuser:
+```
+
+You can now experiment with irods, for an introduction on the possible commands:
+
+```bash
+$ ihelp<enter>
+```

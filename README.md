@@ -103,11 +103,16 @@ Here you need to add the SRAM Service API token that the Service Administrator c
 
 ### ldap.env
 
+You have to be a registered Service Administrator in SRAM in order to collect the service specific details of your LDAP settings.
+
+It is adviced to go to https://sram.surf.nl and go to the details window of your service. Here you will find the section **LDAP settings**,
+Copy the relevant items and paste them into below fields:
+
 ```env
-LDAP_HOST=ldaps://ldap.sram.surf.nl
-LDAP_BASE_DN=dc=flat,dc=<SRAM shortname of your connected service>,dc=services,dc=sram,dc=surf,dc=nl
-LDAP_BIND_DN=cn=admin,dc=<SRAM shortname of your connected service>,dc=services,dc=sram,dc=surf,dc=nl
-LDAP_ADMIN_PASSWORD=<REDACTED>
+LDAP_HOST=<LDAP settings : LDAP URL>
+LDAP_BASE_DN=<LDAP settings : Base dn>
+LDAP_BIND_DN=<LDAP settings : Bind dn>
+LDAP_ADMIN_PASSWORD=<Set your LDAP Password in SRAM, and copy the presented values here>
 LDAP_MODE=IP_V4_ONLY
 ```
 

@@ -64,7 +64,9 @@ if [ "$checkirods" == "" ]; then
     useradd --password $pass --shell /bin/false --no-create-home $IRODS_USER
 fi
 
-service irods start
+sudo -u $IRODS_SERVICE_NAME pkill irodsServer
+sudo -u $IRODS_SERVICE_NAME pkill -9 irodsDelayServe
+sudo -u $IRODS_SERVICE_NAME /var/lib/irods/irodsctl start 
 
 echo "iRODS is ready"
 

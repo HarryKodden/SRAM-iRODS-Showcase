@@ -46,7 +46,7 @@ read -r -d '' CRONJOB <<- EOM
     LOG_LEVEL=${LOG_LEVEL}
     SSH_HOST=${SSH_HOST}
     SSH_PORT=${SSH_PORT}
-    python3 /usr/local/bin/sync.py >> /tmp/sync.log 2>&1
+    python3 /usr/local/bin/sync.py >> /var/log/sync.log 2>&1
 EOM
 crontab -l | { cat; echo "* * * * * "$CRONJOB; } | crontab -
 

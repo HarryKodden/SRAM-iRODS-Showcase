@@ -11,7 +11,6 @@ volumes:
 services:
   database:
     image: postgres:9.1
-    container_name: database
     volumes:
       - irods_database:/var/lib/postgresql/data
       - ./etc/pgs_init.sh:/docker-entrypoint-initdb.d/setup-my-schema.sh:ro
@@ -28,7 +27,6 @@ services:
       context: build
       dockerfile: Dockerfile.icat
     hostname: icat.local
-    container_name: icat
     volumes:
       - irods_config:/var/lib/irods
       - irods_ssl:/var/lib/ssl
@@ -52,7 +50,6 @@ services:
       context: build
       dockerfile: Dockerfile.icommands
     hostname: irods-demo
-    container_name: icommands
     volumes:
       - irods_ssl:/var/lib/ssl
     links:
@@ -76,5 +73,3 @@ services:
 
 networks:
   internal:
-    external:
-      name: localnet

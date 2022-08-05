@@ -35,12 +35,19 @@ We need to have:
 - iRODS 'runner' docker images.
 - iRODS software packages.
 
-To facilitate these steps, a separate repository is available: https://github.com/HarryKodden/iRODS-Development-Bootstrapper.git
+To facilitate these steps, a separate repository is available as submodule (https://github.com/HarryKodden/iRODS-Development-Bootstrapper.git)
+
+Update the submodule
+```
+git submodule update --init
+```
 
 ```bash
+cd iRODS-Development-Bootstrapper
 export DISTRIBUTION=ubuntu20
 make runners
 make builds
+cd ..
 ```
 
 These steps will take an awfull amount of time, best to start them off, see that it is running fine and go to bed, continue the work the next morning...
@@ -48,7 +55,7 @@ These steps will take an awfull amount of time, best to start them off, see that
 Once the build process has completed the following will be created:
 
 - docker image called "**irods-runner-ubuntu20**"
-- directory called "**~/builds/ubuntu20/**" with 3 subdirectories:
+- directory called "**builds/ubuntu20/**" with 3 subdirectories:
 
   - client
   - server
@@ -95,10 +102,17 @@ For evaluation purposes, you can run with these settings. For production use, at
 ### sram.env
 
 ```env
+SRAM_FLOW=TOKEN
 SRAM_URL=https://sram.surf.nl
 SRAM_API=<SRAM Service API Token>
+
+SRAM_OIDC_CLIENT_ID=<<< SRAM OIDC client id >>>
+SRAM_OIDC_CLIENT_SECRET=<<< SRAM OIDC client secret >>>
+SRAM_OIDC_REDIRECT_URI=<<< SRAM OIDC redirect uri >>>
 ```
 
+
+Choose `SRAM_FLOW=TOKEN` or `SRAM_FLOW=OIDC` to switch between token-based and the OIDC flow.
 Here you need to add the SRAM Service API token that the Service Administrator can generate in SRAM.
 
 ### ldap.env

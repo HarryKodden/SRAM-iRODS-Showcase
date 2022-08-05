@@ -7,8 +7,6 @@ volumes:
     driver: local
   irods_ssl:
     driver: local
-  irods_packages:
-    driver: local
 
 services:
   database:
@@ -32,7 +30,6 @@ services:
     volumes:
       - irods_config:/var/lib/irods
       - irods_ssl:/var/lib/ssl
-      - irods_packages:/packages
     depends_on:
       - database
     links:
@@ -55,7 +52,6 @@ services:
     hostname: irods-demo
     volumes:
       - irods_ssl:/var/lib/ssl
-      - irods_packages:/packages-icat:ro
     links:
       - icat
     env_file:

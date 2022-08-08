@@ -20,6 +20,8 @@ ADD packages /packages
 
 RUN dpkg -i /packages/irods-runtime_4.3.0-1~focal_amd64.deb
 RUN dpkg -i /packages/irods-icommands_4.3.0-1~focal_amd64.deb
+# todo: improve packaging dependency
+RUN dpkg --ignore-depends=libcurl4-gnutls-dev -i /packages/irods-auth-interactive-pam-client.deb
 
 ADD icommands.sh /usr/local/bin/icommands.sh
 

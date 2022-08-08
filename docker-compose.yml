@@ -65,7 +65,6 @@ services:
       IRODS_CERT: /var/lib/ssl/irods.crt
       IRODS_HOST: icat
       IRODS_PORT: 1247
-      IRODS_AUTH: pam_password
       SSH_HOST: localhost
       SSH_PORT: 22
     networks:

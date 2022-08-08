@@ -1,3 +1,34 @@
+# Stage 0: Build SRAM-PAM-OIDC module
+FROM ubuntu:20.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+        git \
+        gcc \
+        g++ \
+        cmake \
+        libpam-dev \
+        libcurl4-gnutls-dev \
+        libboost-dev \
+        pamtester \
+        rsyslog && \
+    apt-get clean
+
+WORKDIR /source
+RUN git clone https://github.com/stefan-wolfsheimer/SRAM-PAM-OIDC.git
+RUN mkdir SRAM-PAM-OIDC/build && \
+    cd /source/SRAM-PAM-OIDC && \
+    git submodule update --init --recursive && \
+    mkdir /packages
+
+RUN cd /source/SRAM-PAM-OIDC/build && \
+    cmake .. && \
+    make && \
+    cpack
+
+# ########################################
+# main stage
 FROM irods-runner-ubuntu20
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -7,7 +38,7 @@ RUN apt-get update
 RUN apt-get install -y libfuse2
 RUN apt-get install -y build-essential make ca-certificates git sudo
 RUN apt-get install -y autoconf libpam-dev libcurl4-gnutls-dev libhiredis-dev libssl-dev
-RUN apt-get install -y rsyslog locales
+RUN apt-get install -y rsyslog gettext-base locales
 
 RUN locale-gen en_US.UTF-8
 RUN update-locale
@@ -19,11 +50,16 @@ RUN cd SRAM-Token-Service && make && make install
 
 # PREPARE IRODS SERVER
 ADD packages /packages
+COPY --from=0 /packages/sram-pam-oidc_0.0.1-1_amd64.deb /packages/sram-pam-oidc_0.0.1-1_amd64.deb
 
 RUN dpkg -i /packages/irods-runtime_4.3.0-1~focal_amd64.deb
 RUN dpkg -i /packages/irods-server_4.3.0-1~focal_amd64.deb
 RUN dpkg -i /packages/irods-database-plugin-postgres_4.3.0-1~focal_amd64.deb
 RUN dpkg -i /packages/irods-icommands_4.3.0-1~focal_amd64.deb
+RUN dpkg -i /packages/sram-pam-oidc_0.0.1-1_amd64.deb
+# todo fix deb package
+RUN ln -s /lib/x86_64-linux-gnu/security/pam_sram_oidc.so  /lib/security/pam_sram_oidc.so
+RUN dpkg -i /packages/irods-auth-interactive-pam-server.deb
 
 VOLUME /var/lib/irods
 VOLUME /var/lib/ssl

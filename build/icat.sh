@@ -57,15 +57,30 @@ if [ "$checkirods" == "" ]; then
     sed -i '5i    "irods_ssl_dh_params_file": "/etc/irods/ssl/dhparams.pem", '      /var/lib/irods/.irods/irods_environment.json
 
     # make PAM config for iRODS
-    echo "auth required /usr/local/bin/pam_sram_validate.so debug url=$SRAM_URL token=$SRAM_API" > /etc/pam.d/irods
+    echo "auth required /usr/local/bin/pam_sram_validate.so debug url=$SRAM_URL token=$SRAM_API" > /etc/pam.d/irods.token
 
     # make System Account for iRODS Admin
     pass=`echo $IRODS_PASS | openssl passwd -crypt -noverify -stdin`
     useradd --password $pass --shell /bin/false --no-create-home $IRODS_USER
 fi
 
-service irods start
+sudo -u $IRODS_SERVICE_NAME pkill irodsServer
+sudo -u $IRODS_SERVICE_NAME pkill -9 irodsDelayServe
+sudo -u $IRODS_SERVICE_NAME /var/lib/irods/irodsctl start 
 
 echo "iRODS is ready"
+
+echo "configure SRAM OIDC"
+cat /etc/sram_config.json.template | envsubst > /etc/sram_config.json 
+
+echo "configure PAM stack"
+if [ ! -e /etc/pam.d/irods ]; then
+  if [ "$SRAM_FLOW" == "TOKEN" ]; then
+    ln -s /etc/pam.d/irods.token /etc/pam.d/irods
+  else
+    ln -s /etc/pam.d/sram /etc/pam.d/irods
+  fi
+fi
+
 
 sleep infinity

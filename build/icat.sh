@@ -50,6 +50,14 @@ if [ "$checkirods" == "" ]; then
         exit 1
     fi
 
+    # Adjust core.re to enforce SSL handshake
+    sed -i 's/CS_NEG_REQUIRE/CS_NEG_DONT_CARE/' /etc/irods/core.re
+    sed -i 's/CS_NEG_REFUSE/CS_NEG_DONT_CARE/'  /etc/irods/core.re
+
+    # Adjust default environment to enforce SSL handshake
+    sed -i 's/CS_NEG_REQUIRE/CS_NEG_DONT_CARE/' /var/lib/irods/.irods/irods_environment.json
+    sed -i 's/CS_NEG_REFUSE/CS_NEG_DONT_CARE/'  /var/lib/irods/.irods/irods_environment.json
+
     # Adjust default environment.json to make use of SSL cert...
     sed -i '2i    "irods_ssl_certificate_chain_file": "/var/lib/ssl/irods.crt", ' /var/lib/irods/.irods/irods_environment.json
     sed -i '3i    "irods_ssl_certificate_key_file": "/etc/irods/ssl/irods.key", '   /var/lib/irods/.irods/irods_environment.json

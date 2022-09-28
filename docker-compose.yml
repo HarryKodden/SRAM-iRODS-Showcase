@@ -54,7 +54,7 @@ services:
     volumes:
       - irods_ssl:/var/lib/ssl
     links:
-      - icat
+      - icat:icat.local
     env_file:
       - ./env/irods.env
       - ./env/ldap.env
@@ -64,7 +64,6 @@ services:
       LOG_LEVEL: INFO
       IRODS_JSON: /etc/default/default_irods_environment.json
       IRODS_CERT: /var/lib/ssl/irods.crt
-      IRODS_HOST: icat
       IRODS_PORT: ${IRODS_SERVICE_PORT:-1247}
       SSH_HOST: localhost
       SSH_PORT: 22
@@ -77,11 +76,10 @@ services:
       dockerfile: Dockerfile.davrods
     hostname: docker-davrods.local
     links:
-      - icat
+      - icat:icat.local
     env_file:
       - ./env/irods.env
     environment:
-      IRODS_HOST: icat
       IRODS_PORT: ${IRODS_SERVICE_PORT:-1247}
       IRODS_SSL_VERIFY_SERVER: cert
       IRODS_SSL_CA_CERT: /var/lib/ssl/irods.crt

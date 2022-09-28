@@ -6,11 +6,6 @@ _irods_environment_json() {
     jq -n \
         --arg host "${IRODS_HOST}" \
         --argjson port "${IRODS_PORT}" \
-        --arg resc "${IRODS_DEFAULT_RESOURCE}" \
-        --arg home "${IRODS_HOME}" \
-        --arg cwd "${IRODS_CWD}" \
-        --arg user "${IRODS_USER_NAME}" \
-        --arg zone "${IRODS_ZONE_NAME}" \
         --arg cneg "${IRODS_CLIENT_SERVER_NEGOTIATION}" \
         --arg cpol "${IRODS_CLIENT_SERVER_POLICY}" \
         --argjson ekey "${IRODS_ENCRYPTION_KEY_SIZE}" \
@@ -19,10 +14,6 @@ _irods_environment_json() {
         --arg ealgo "${IRODS_ENCRYPTION_ALGORITHM}" \
         --arg dhash "${IRODS_DEFAULT_HASH_SCHEME}" \
         --arg mhash "${IRODS_MATCH_HASH_POLICY}" \
-        --argjson cpport "${IRODS_SERVER_CONTROL_PLANE_PORT}" \
-        --arg cpkey "${IRODS_SERVER_CONTROL_PLANE_KEY}" \
-        --argjson cphash "${IRODS_SERVER_CONTROL_PLANE_ENCRYPTION_NUM_HASH_ROUNDS}" \
-        --arg cpalgo "${IRODS_SERVER_CONTROL_PLANE_ENCRYPTION_ALGORITHM}" \
         --argjson bmax "${IRODS_MAXIMUM_SIZE_FOR_SINGLE_BUFFER_IN_MEGABYTES}" \
         --argjson nthr "${IRODS_DEFAULT_NUMBER_OF_TRANSFER_THREADS}" \
         --argjson bsize "${IRODS_TRANSFER_BUFFER_SIZE_FOR_PARALLEL_TRANSFER_IN_MEGABYTES}" \
@@ -30,11 +21,6 @@ _irods_environment_json() {
         --arg sslcacrt "${IRODS_SSL_CA_CERT}" \
         '{"irods_host": $host,
         "irods_port": $port,
-        "irods_default_resource": $resc,
-        "irods_home": $home,
-        "irods_cwd": $cwd,
-        "irods_user_name": $user,
-        "irods_zone_name": $zone,
         "irods_client_server_negotiation": $cneg,
         "irods_client_server_policy": $cpol,
         "irods_encryption_key_size": $ekey,
@@ -43,10 +29,6 @@ _irods_environment_json() {
         "irods_encryption_algorithm": $ealgo,
         "irods_default_hash_scheme": $dhash,
         "irods_match_hash_policy": $mhash,
-        "irods_server_control_plane_port": $cpport,
-        "irods_server_control_plane_key": $cpkey,
-        "irods_server_control_plane_encryption_num_hash_rounds": $cphash,
-        "irods_server_control_plane_encryption_algorithm": $cpalgo,
         "irods_maximum_size_for_single_buffer_in_megabytes": $bmax,
         "irods_default_number_of_transfer_threads": $nthr,
         "irods_transfer_buffer_size_for_parallel_transfer_in_megabytes": $bsize,
@@ -55,8 +37,8 @@ _irods_environment_json() {
 }
 
 _vhost_conf () {
-    if [[ -f /etc/davrods_conf.d/davrods.conf ]]; then
-        local OUTFILE=/etc/davrods_conf.d/davrods.conf
+    if [[ -f /etc/apache2/sites-available/davrods.conf ]]; then
+        local OUTFILE=/etc/apache2/sites-available/davrods.conf
         if [[ "${SSL_ENGINE,,}" == 'on' ]]; then
             # SSL settings
             sed -i 's!#LoadModule ssl_module modules/mod_ssl.so!LoadModule ssl_module modules/mod_ssl.so!' $OUTFILE
@@ -74,8 +56,6 @@ _vhost_conf () {
         sed -i 's!#DavRodsExposedRoot  User!DavRodsExposedRoot  '"${VHOST_DAV_RODS_EXPOSED_ROOT}"'!' $OUTFILE
     fi
 }
-
-echo "IncludeOptional /etc/davrods_conf.d/*.conf" >> /etc/apache2/apache2.conf 
 
 _irods_environment_json
 _vhost_conf

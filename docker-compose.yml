@@ -78,17 +78,16 @@ services:
     hostname: docker-davrods.local
     links:
       - icat
+    env_file:
+      - ./env/irods.env
     environment:
       IRODS_HOST: icat
       IRODS_PORT: ${IRODS_SERVICE_PORT:-1247}
-      IRODS_ZONE: ${IRODS_ZONE:-tempZone}
-      IRODS_USER: ${IRODS_USER:-rods}
-      IRODS_PASS: ${IRODS_PASS:-password}
       IRODS_SSL_VERIFY_SERVER: cert
       IRODS_SSL_CA_CERT: /var/lib/ssl/irods.crt
       IRODS_CLIENT_SERVER_POLICY: CS_NEG_REQUIRE
       VHOST_SERVER_NAME: docker-davrods.local
-      VHOST_LOCATION: /tempzone
+      VHOST_LOCATION: /
       VHOST_DAV_RODS_AUTH_SCHEME: PAM
       VHOST_DAV_RODS_EXPOSED_ROOT: User
     restart: always

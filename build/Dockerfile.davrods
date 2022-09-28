@@ -22,36 +22,22 @@ WORKDIR /opt
 RUN git clone https://github.com/UtrechtUniversity/davrods.git
 RUN cd davrods && git checkout development-irods4.3 && mkdir build && cd build && cmake .. && make install
 
-RUN useradd apache
-
-RUN a2enmod dav
-RUN a2enmod davrods
-RUN a2dissite 000-default
-
 # irods_environment.json
 ENV IRODS_HOST='localhost' \
     IRODS_PORT=1247 \
-    IRODS_DEFAULT_RESOURCE='' \
-    IRODS_HOME='/tempZone/home/rods' \
-    IRODS_CWD='/tempZone/home/rods' \
-    IRODS_USER_NAME='rods' \
-    IRODS_ZONE_NAME='tempZone' \
     IRODS_CLIENT_SERVER_NEGOTIATION='request_server_negotiation' \
     IRODS_CLIENT_SERVER_POLICY='CS_NEG_DONT_CARE' \
+    IRODS_MAXIMUM_SIZE_FOR_SINGLE_BUFFER_IN_MEGABYTES=32 \
+    IRODS_DEFAULT_NUMBER_OF_TRANSFER_THREADS=4 \
+    IRODS_TRANSFER_BUFFER_SIZE_FOR_PARALLEL_TRANSFER_IN_MEGABYTES=4 \
     IRODS_ENCRYPTION_KEY_SIZE=32 \
     IRODS_ENCRYPTION_SALT_SIZE=8 \
     IRODS_ENCRYPTION_NUM_HASH_ROUNDS=16 \
     IRODS_ENCRYPTION_ALGORITHM='AES-256-CBC' \
     IRODS_DEFAULT_HASH_SCHEME='SHA256' \
     IRODS_MATCH_HASH_POLICY='compatible' \
-    IRODS_SERVER_CONTROL_PLANE_PORT=1248 \
-    IRODS_SERVER_CONTROL_PLANE_KEY='TEMPORARY__32byte_ctrl_plane_key' \
-    IRODS_SERVER_CONTROL_PLANE_ENCRYPTION_NUM_HASH_ROUNDS=16 \
-    IRODS_SERVER_CONTROL_PLANE_ENCRYPTION_ALGORITHM='AES-256-CBC' \
-    IRODS_MAXIMUM_SIZE_FOR_SINGLE_BUFFER_IN_MEGABYTES=32 \
-    IRODS_DEFAULT_NUMBER_OF_TRANSFER_THREADS=4 \
-    IRODS_TRANSFER_BUFFER_SIZE_FOR_PARALLEL_TRANSFER_IN_MEGABYTES=4 \
     IRODS_SSL_VERIFY_SERVER='hostname'
+
 # VirtualHost settings
 ENV VHOST_SERVER_NAME='dav.example.com' \
     VHOST_LOCATION='/' \
@@ -59,14 +45,21 @@ ENV VHOST_SERVER_NAME='dav.example.com' \
     VHOST_DAV_RODS_ZONE='tempZone' \
     VHOST_DAV_RODS_AUTH_SCHEME='Native' \
     VHOST_DAV_RODS_EXPOSED_ROOT='User'
+
 # SSL settings
 ENV SSL_ENGINE='off' \
     SSL_CERTIFICATE_FILE='' \
     SSL_CERTIFICATE_KEY_FILE=''
 
-COPY ./davrods.conf /etc/davrods_conf.d/davrods.conf
+COPY ./davrods.conf /etc/apache2/sites-available/davrods.conf
 COPY ./davrods.sh /docker-entrypoint.sh
 RUN chmod a+x /docker-entrypoint.sh
+run chmod a+w /var/lib/davrods
+
+RUN a2enmod dav
+RUN a2enmod davrods
+RUN a2dissite 000-default
+RUN a2ensite davrods
 
 EXPOSE 80
 

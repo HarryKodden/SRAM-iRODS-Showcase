@@ -55,11 +55,17 @@ services:
       - irods_ssl:/var/lib/ssl
     links:
       - icat:icat.local
+      - davrods:docker-davrods.local
     env_file:
       - ./env/irods.env
       - ./env/ldap.env
     ports:
       - "2222:22"
+    privileged: true
+    cap_add:
+      - CAP_SYS_ADMIN
+    devices:
+      - /dev/fuse
     environment:
       LOG_LEVEL: INFO
       IRODS_JSON: /etc/default/default_irods_environment.json

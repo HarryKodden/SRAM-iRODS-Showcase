@@ -15,6 +15,11 @@ WORKDIR /opt
 RUN git clone https://github.com/HarryKodden/irods-ldap-sync.git
 RUN cd irods-ldap-sync && pip install -r requirements.txt && ln -s ${PWD}/src/sync.py /usr/local/bin/
 
+# PREPARE DAVFS
+RUN apt-get update && apt install -y davfs2
+RUN chmod u+s /usr/sbin/mount.davfs
+RUN echo "http://docker-davrods.local /mnt davfs user,noauto,rw,_netdev 0 0" >> /etc/fstab
+
 # PREPARE IRODS CLIENT
 ADD packages /packages
 
@@ -23,8 +28,8 @@ RUN dpkg -i /packages/irods-icommands_4.3.0-1~focal_amd64.deb
 # todo: improve packaging dependency
 RUN dpkg --ignore-depends=libcurl4-gnutls-dev -i /packages/irods-auth-interactive-pam-client.deb
 
+# Final details...
 ADD icommands.sh /usr/local/bin/icommands.sh
-
 RUN chmod a+x /usr/local/bin/*.sh
 
 ENTRYPOINT []

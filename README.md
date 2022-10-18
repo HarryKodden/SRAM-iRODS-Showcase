@@ -101,19 +101,54 @@ For evaluation purposes, you can run with these settings. For production use, at
 
 ### sram.env
 
+
+
+There are 3 PAM flows supported that you can choose from by varying the `SRAM_FLOW` environment variable in the `iCAT` container.
+1. `SRAM_FLOW=TOKEN`
+2. `SRAM_FLOW=OIDC`
+3. `SRAM_FLOW=DEVICE`
+
+The flows require different environment variable, so make sure you have the corresponding variables provided as well.
+
+#### Token flow
+
 ```env
 SRAM_FLOW=TOKEN
 SRAM_URL=https://sram.surf.nl
-SRAM_API=<SRAM Service API Token>
-
-SRAM_OIDC_CLIENT_ID=<<< SRAM OIDC client id >>>
-SRAM_OIDC_CLIENT_SECRET=<<< SRAM OIDC client secret >>>
-SRAM_OIDC_REDIRECT_URI=<<< SRAM OIDC redirect uri >>>
+SRAM_API=<SRAM Service API Token> [*]
 ```
 
+[*] Here you need to add the SRAM Service API token that the Service Administrator can generate in SRAM.
 
-Choose `SRAM_FLOW=TOKEN` or `SRAM_FLOW=OIDC` to switch between token-based and the OIDC flow.
-Here you need to add the SRAM Service API token that the Service Administrator can generate in SRAM.
+#### OIDC flow
+
+```env
+SRAM_FLOW=OIDC
+SRAM_OIDC_CLIENT_ID=<<< your (registered) client id >>>
+SRAM_OIDC_CLIENT_SECRET=<<< your (registered) client secret >>>
+SRAM_OIDC_REDIRECT_URI=<<< your (registered) redirect uri >>>
+SRAM_OIDC_AUTHORIZATION_EP=<<< OIDC AUTHORIZATION ENDPOINT >>
+SRAM_OIDC_TOKEN_EP=<<< OIDC TOKEN ENDPOINT >>
+SRAM_OIDC_INTROSPECT_URL=<<< OIDC USERINFO ENDPOINT >>
+SRAM_OIDC_RESPONSE_TYPE=code
+SRAM_OIDC_RESULT_FIELD=/eduperson_principal_name/0
+SRAM_OIDC_SCOPE=openid offline_access email eduperson_principal_name
+SRAM_OIDC_ACCESS_TYPE=offline
+SRAM_OIDC_PROMPT=consent
+```
+
+#### DEVICE flow
+
+```env
+SRAM_FLOW=DEVICE
+WELL_KNOWN_ENDPOINT=<<< OIDC Well Known Endpoint, e.g. https://.../.well-known/openid-configuration
+SCOPE=openid offline_access uid
+CLIENT_ID=<<< your (registered) client id >>>
+REFRESH_TOKEN_ENDPOINT=<<< If you want to refresh tokens, put the refresh token endpoint here >>
+USER_ATTRIBUTE=/uid/0
+SESSION_PATH=/var/local
+```
+
 
 ### ldap.env
 

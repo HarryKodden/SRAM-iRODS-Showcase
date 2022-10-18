@@ -42,7 +42,9 @@ services:
       IRODS_DB_HOST: database
       DATABASE_TYPE: "postgres"
       SESSION_MINUTES: 60
-      SRAM_FLOW: TOKEN
+#     SRAM_FLOW: TOKEN
+#     SRAM_FLOW: OIDC
+      SRAM_FLOW: DEVICE
     networks:
       - internal
 

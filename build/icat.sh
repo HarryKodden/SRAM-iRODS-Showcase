@@ -60,9 +60,9 @@ if [ "$checkirods" == "" ]; then
 
     # Adjust default environment.json to make use of SSL cert...
     sed -i '2i    "irods_ssl_certificate_chain_file": "/var/lib/ssl/irods.crt", ' /var/lib/irods/.irods/irods_environment.json
-    sed -i '3i    "irods_ssl_certificate_key_file": "/etc/irods/ssl/irods.key", '   /var/lib/irods/.irods/irods_environment.json
+    sed -i '3i    "irods_ssl_certificate_key_file": "/etc/irods/ssl/irods.key", ' /var/lib/irods/.irods/irods_environment.json
     sed -i '4i    "irods_ssl_ca_certificate_file": "/var/lib/ssl/irods.crt", '    /var/lib/irods/.irods/irods_environment.json
-    sed -i '5i    "irods_ssl_dh_params_file": "/etc/irods/ssl/dhparams.pem", '      /var/lib/irods/.irods/irods_environment.json
+    sed -i '5i    "irods_ssl_dh_params_file": "/etc/irods/ssl/dhparams.pem", '    /var/lib/irods/.irods/irods_environment.json
 
     # make PAM config for iRODS
     echo "auth required /usr/local/bin/pam_sram_validate.so debug url=$SRAM_URL token=$SRAM_API" > /etc/pam.d/irods.token
@@ -81,12 +81,21 @@ echo "iRODS is ready"
 echo "configure SRAM OIDC"
 cat /etc/sram_config.json.template | envsubst > /etc/sram_config.json 
 
+echo "configure SRAM PAM DEVICE CODE FLOW"
+cat /etc/pam_oidc_device_flow.json.template | envsubst > /etc/pam_oidc_device_flow.json 
+
 echo "configure PAM stack"
 if [ ! -e /etc/pam.d/irods ]; then
   if [ "$SRAM_FLOW" == "TOKEN" ]; then
     ln -s /etc/pam.d/irods.token /etc/pam.d/irods
-  else
+  fi
+
+  if [ "$SRAM_FLOW" == "OIDC" ]; then
     ln -s /etc/pam.d/sram /etc/pam.d/irods
+  fi
+
+  if [ "$SRAM_FLOW" == "DEVICE" ]; then
+    ln -s pam_oidc_device_flow /etc/pam.d/irods
   fi
 fi
 
